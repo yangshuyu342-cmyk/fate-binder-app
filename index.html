@@ -2,17 +2,16 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Fate Binder 手機版 — 命運共同體</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>命運共同體 Fate Binder — 防拖延雙人專注系統</title>
   <style>
     :root {
-      --partner-bg: #a7c7e7;
-      --partner-grad: linear-gradient(180deg, #b8d5f0 0%, #9ec2e6 100%);
-      --user-bg: #a8d5ba;
-      --user-grad: linear-gradient(180deg, #bce3cc 0%, #9cd0b1 100%);
+      --partner-accent: #4a90e2;
+      --user-accent: #2ecc71;
       --danger: #ff5e5e;
-      --ink: #1e293b;
-      --muted: #475569;
+      --warn-amber: #f59e0b;
+      --text-dark: #2c3e50;
+      --text-muted: #607d8b;
     }
 
     * {
@@ -20,714 +19,1128 @@
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
-      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background: #e2e8f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    /* 手機外框容器（在手機上滿版，在電腦上看像手機螢幕） */
-    .phone-frame {
-      width: 100%;
-      max-width: 414px;
+      background-color: #f6f7f9;
+      color: var(--text-dark);
       height: 100vh;
-      max-height: 860px;
-      background: #ffffff;
-      position: relative;
       overflow: hidden;
-      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
       display: flex;
-      flex-direction: column;
-    }
-
-    @media (min-width: 450px) {
-      .phone-frame {
-        height: 92vh;
-        border-radius: 36px;
-        border: 8px solid #1e293b;
-      }
-    }
-
-    /* ================= 1. 手機首頁：任務設定 ================= */
-    #setup-view {
-      flex: 1;
-      padding: 28px 22px 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      background: #f8fafc;
-      overflow-y: auto;
-    }
-
-    .top-pill {
-      display: inline-block;
-      background: #e0f2fe;
-      color: #0369a1;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 5px 12px;
-      border-radius: 999px;
-      margin-bottom: 10px;
-    }
-
-    .setup-title {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--ink);
-      margin-bottom: 6px;
-    }
-
-    .setup-sub {
-      font-size: 13.5px;
-      color: var(--muted);
-      line-height: 1.5;
-      margin-bottom: 18px;
-    }
-
-    .card-box {
-      background: #ffffff;
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
-      margin-bottom: 14px;
-    }
-
-    .field-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--ink);
-      margin-bottom: 8px;
-    }
-
-    .task-input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 12px;
-      font-size: 15px;
-      outline: none;
-    }
-
-    .task-input:focus {
-      border-color: #0284c7;
-    }
-
-    .dur-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .dur-btn {
-      padding: 10px 6px;
-      border-radius: 12px;
-      border: 1.5px solid #cbd5e1;
-      background: #fff;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--ink);
-      cursor: pointer;
-    }
-
-    .dur-btn.active {
-      border-color: #16a34a;
-      background: #dcfce7;
-      color: #15803d;
-    }
-
-    .privacy-note {
-      background: #f1f5f9;
-      border-radius: 14px;
-      padding: 12px;
-      font-size: 12px;
-      color: #334155;
-      line-height: 1.45;
-      margin-bottom: 14px;
-    }
-
-    .cta-btn {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #ff7e5f, #feb47b);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 10px 20px rgba(255, 126, 95, 0.3);
-    }
-
-    /* ================= 配對載入畫面 ================= */
-    #matching-view {
-      display: none;
-      position: absolute;
-      inset: 0;
-      background: rgba(255, 255, 255, 0.96);
-      z-index: 40;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 24px;
+    }
+
+    /* ================= 頁面 1：任務設定首頁 ================= */
+    #setup-screen {
+      background: #ffffff;
+      padding: 38px 34px;
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.06);
+      width: 100%;
+      max-width: 480px;
       text-align: center;
     }
 
-    .loader {
-      width: 48px;
-      height: 48px;
-      border: 4px solid #e2e8f0;
-      border-top-color: #0284c7;
+    .logo-badge {
+      display: inline-block;
+      background: #eef6fc;
+      color: var(--partner-accent);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .resume-badge {
+      display: none;
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fcd34d;
+      font-weight: 700;
+      font-size: 12.5px;
+      padding: 7px 14px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      line-height: 1.45;
+    }
+
+    h1 {
+      font-size: 27px;
+      margin-bottom: 8px;
+      color: #1a252f;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 22px;
+      line-height: 1.55;
+    }
+
+    .input-group {
+      text-align: left;
+      margin-bottom: 18px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 13px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--partner-accent);
+    }
+
+    input[type="text"]:disabled {
+      background: #f1f5f9;
+      color: #334155;
+      border-color: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .time-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .time-btn {
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      background: #fff;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text-dark);
+    }
+
+    .time-btn.active {
+      border-color: var(--user-accent);
+      background: #effaf3;
+      color: #1e8449;
+    }
+
+    .time-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .privacy-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      text-align: left;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+
+    .start-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #ff7e5f, #feb47b);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255, 126, 95, 0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(255, 126, 95, 0.4);
+    }
+
+    /* ================= 配對過場遮罩 ================= */
+    #matching-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.96);
+      z-index: 50;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 54px;
+      height: 54px;
+      border: 5px solid #e2e8f0;
+      border-top-color: var(--partner-accent);
       border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-      margin-bottom: 16px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
 
-    /* ================= 2. 手機雙人專注主畫面（上下分割） ================= */
-    #focus-view {
+    /* ================= 頁面 2：雙人專注主畫面 ================= */
+    #focus-screen {
       display: none;
-      flex: 1;
-      flex-direction: column;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
+      grid-template-columns: 1fr 1fr;
       position: relative;
     }
 
-    /* 上半部：您的戰友 */
-    .top-partner {
-      flex: 0.92;
-      background: var(--partner-grad);
-      padding: 14px 18px 12px;
+    .energy-beam {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(to bottom, #6dd5ed, #2ecc71, #6dd5ed);
+      transform: translateX(-50%);
+      box-shadow: 0 0 18px rgba(46, 204, 113, 0.8);
+      z-index: 10;
+      transition: all 0.3s;
+    }
+
+    .energy-beam.danger {
+      background: var(--danger);
+      box-shadow: 0 0 25px var(--danger);
+      animation: pulse-fast 0.4s infinite alternate;
+    }
+
+    @keyframes pulse-fast {
+      from { opacity: 0.4; }
+      to { opacity: 1; }
+    }
+
+    /* 左側：戰友面板 */
+    .partner-panel {
+      background: linear-gradient(160deg, #d4e7f7 0%, #ebf4fc 100%);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
+      padding: 36px;
       position: relative;
     }
 
-    .role-badge {
-      background: rgba(255, 255, 255, 0.82);
-      color: var(--ink);
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 999px;
+    .partner-tag {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #2b5876;
     }
 
-    .partner-center {
+    .silhouette-stage {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    .glow-circle {
-      width: 96px;
-      height: 96px;
+    .glow-aura {
+      width: 170px;
+      height: 170px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 243, 176, 0.95) 0%, rgba(255, 243, 176, 0) 72%);
+      background: radial-gradient(circle, rgba(255, 223, 130, 0.85) 0%, rgba(255, 223, 130, 0) 70%);
       display: flex;
       justify-content: center;
       align-items: center;
-      animation: pulse 2.8s ease-in-out infinite;
+      animation: breathe 3s ease-in-out infinite;
     }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.06); }
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.08); opacity: 1; }
     }
 
-    .partner-avatar {
-      font-size: 46px;
+    .avatar-icon {
+      font-size: 70px;
     }
 
-    .partner-status {
-      background: #1e293b;
-      color: #f8fafc;
-      font-size: 11.5px;
-      font-weight: 600;
-      padding: 4px 12px;
-      border-radius: 999px;
-      margin-top: 4px;
+    .status-pill {
+      margin-top: 12px;
+      background: #2c3e50;
+      color: #fff;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .partner-goal {
-      margin-top: 6px;
-      font-size: 12.5px;
-      color: #1e293b;
-      background: rgba(255, 255, 255, 0.65);
-      padding: 4px 12px;
+    .dot-green {
+      width: 8px;
+      height: 8px;
+      background: #2ecc71;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #2ecc71;
+    }
+
+    .partner-task-box {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #34495e;
+      background: rgba(255,255,255,0.65);
+      padding: 8px 18px;
       border-radius: 10px;
     }
 
-    .cheer-row {
+    .bubble-area {
+      height: 40px;
       display: flex;
-      gap: 8px;
-      width: 100%;
+      align-items: center;
       justify-content: center;
     }
 
-    .mini-cheer {
+    .reaction-bubble {
+      background: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+
+    .cheer-bar {
+      display: flex;
+      gap: 10px;
+    }
+
+    .cheer-btn {
       background: rgba(255, 255, 255, 0.88);
-      border: none;
-      border-radius: 999px;
-      padding: 6px 11px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--ink);
+      border: 1px solid #fff;
+      padding: 10px 16px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
     }
 
-    /* 中央命運連線條 */
-    .link-bar {
-      height: 6px;
-      width: 100%;
-      background: linear-gradient(90deg, #38bdf8, #22c55e, #38bdf8);
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
-      z-index: 5;
-      transition: all 0.25s;
-    }
-
-    .link-bar.alert {
-      background: var(--danger);
-      box-shadow: 0 0 16px var(--danger);
-    }
-
-    /* 下半部：您（計時器 + 鏡頭 AI 監督） */
-    .bottom-user {
-      flex: 1.08;
-      background: var(--user-grad);
-      padding: 12px 18px 14px;
+    /* 右側：個人專注與 AI 監督面板 */
+    .user-panel {
+      background: linear-gradient(160deg, #d7f0e0 0%, #eef9f2 100%);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      position: relative;
-      transition: background 0.25s;
-    }
-
-    .bottom-user.alert {
-      background: linear-gradient(180deg, #fecaca 0%, #fca5a5 100%);
-    }
-
-    .user-top-line {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-    }
-
-    .user-main-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin: auto 0;
-    }
-
-    /* 圓形倒數計時器 */
-    .ring-wrap {
+      padding: 36px;
       position: relative;
-      width: 152px;
-      height: 152px;
+      transition: background 0.3s;
+    }
+
+    .user-panel.warning-mode {
+      background: linear-gradient(160deg, #ffd6d6 0%, #ffecec 100%);
+    }
+
+    .timer-wrapper {
+      position: relative;
+      width: 230px;
+      height: 230px;
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-shrink: 0;
     }
 
-    .ring-svg {
+    .timer-svg {
       position: absolute;
       inset: 0;
       transform: rotate(-90deg);
     }
 
-    .ring-bg {
-      fill: rgba(255, 255, 255, 0.88);
+    .timer-circle-bg {
+      fill: rgba(255, 255, 255, 0.85);
       stroke: #e2e8f0;
-      stroke-width: 8;
+      stroke-width: 10;
     }
 
-    .ring-fg {
+    .timer-circle-progress {
       fill: none;
-      stroke: #ff5e5e;
-      stroke-width: 8;
+      stroke: #ff6b6b;
+      stroke-width: 10;
       stroke-linecap: round;
-      stroke-dasharray: 415;
+      stroke-dasharray: 628;
       stroke-dashoffset: 0;
       transition: stroke-dashoffset 1s linear;
     }
 
-    .countdown-num {
+    .timer-text {
       position: relative;
       font-family: "JetBrains Mono", "Courier New", monospace;
-      font-size: 30px;
+      font-size: 46px;
       font-weight: 800;
-      color: var(--ink);
+      color: #1a252f;
     }
 
-    /* 右側鏡頭監督區（只有系統與自己看得到，戰友看不到） */
-    .cam-column {
+    .my-task-display {
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    .my-task-display span {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .my-task-display strong {
+      font-size: 19px;
+      color: #1a252f;
+    }
+
+    .status-pills-row {
       display: flex;
       flex-direction: column;
       align-items: center;
-      flex: 1;
+      gap: 6px;
+      margin-top: 8px;
     }
 
-    .cam-ring {
-      width: 104px;
-      height: 104px;
+    .study-monitor-pill {
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #15803d;
+    }
+
+    .study-monitor-pill.bad {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .violation-count-pill {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.75);
+      color: #334155;
+    }
+
+    .violation-count-pill.has-violation {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    /* 右下角鏡頭監督視窗 */
+    .webcam-box {
+      position: absolute;
+      right: 24px;
+      bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .webcam-circle {
+      width: 112px;
+      height: 112px;
       border-radius: 50%;
       overflow: hidden;
-      border: 3.5px solid #16a34a;
-      background: #1e293b;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+      border: 4px solid var(--user-accent);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      background: #1e272e;
+      transition: border-color 0.3s;
     }
 
-    .cam-ring.alert {
+    .webcam-circle.danger {
       border-color: var(--danger);
     }
 
-    #cam-video {
+    #webcam-video {
       width: 100%;
       height: 100%;
       object-fit: cover;
       transform: scaleX(-1);
     }
 
-    .ai-tag {
-      margin-top: -10px;
-      background: #1e293b;
-      color: #4ade80;
-      font-size: 10.5px;
-      font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 999px;
+    .ai-badge {
+      margin-top: -12px;
       z-index: 2;
-    }
-
-    .cam-sub {
-      font-size: 10.5px;
-      color: #1e293b;
-      margin-top: 4px;
-      text-align: center;
-      line-height: 1.25;
-      font-weight: 600;
-    }
-
-    .task-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.72);
-      padding: 8px 12px;
-      border-radius: 12px;
-    }
-
-    .my-task-label {
-      font-size: 12.5px;
-      font-weight: 700;
-      color: var(--ink);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .demo-actions {
-      display: flex;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-
-    .demo-btn {
-      border: none;
-      background: #e2e8f0;
-      color: #1e293b;
+      background: #1e272e;
+      color: #2ecc71;
       font-size: 11px;
       font-weight: 700;
-      padding: 5px 8px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    /* 警告提示條 */
-    #warn-toast {
-      display: none;
-      position: absolute;
-      top: 10px;
-      left: 12px;
-      right: 12px;
-      background: var(--danger);
-      color: #fff;
-      font-size: 12.5px;
-      font-weight: 700;
-      padding: 10px 14px;
+      padding: 4px 10px;
       border-radius: 12px;
-      text-align: center;
-      z-index: 60;
-      box-shadow: 0 8px 20px rgba(255, 94, 94, 0.4);
     }
 
-    /* ================= 結算彈窗 ================= */
-    #end-modal {
+    .privacy-mini-note {
+      font-size: 11px;
+      color: #546e7a;
+      margin-top: 4px;
+    }
+
+    .bottom-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      z-index: 5;
+      max-width: 440px;
+    }
+
+    .btn-outline {
+      background: rgba(255,255,255,0.82);
+      border: 1px solid #cbd5e1;
+      padding: 8px 13px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #334155;
+    }
+
+    .btn-outline:hover {
+      background: #fff;
+    }
+
+    .btn-offline {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      color: #92400e;
+    }
+
+    .btn-offline:hover {
+      background: #fde68a;
+    }
+
+    /* 警告 / 重設提示橫幅 */
+    #warning-banner {
       display: none;
-      position: absolute;
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--danger);
+      color: white;
+      padding: 12px 22px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 10px 25px rgba(255, 94, 94, 0.4);
+      z-index: 100;
+      max-width: 90vw;
+      text-align: center;
+    }
+
+    /* 結算彈窗 */
+    #result-modal {
+      display: none;
+      position: fixed;
       inset: 0;
       background: rgba(15, 23, 42, 0.75);
-      z-index: 80;
+      backdrop-filter: blur(6px);
+      z-index: 200;
       justify-content: center;
       align-items: center;
-      padding: 24px;
     }
 
-    .end-box {
-      background: #fff;
-      border-radius: 22px;
-      padding: 28px 22px;
+    .modal-card {
+      background: white;
+      padding: 36px;
+      border-radius: 24px;
+      max-width: 440px;
+      width: 90%;
       text-align: center;
-      width: 100%;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+    }
+
+    .modal-icon {
+      font-size: 54px;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .modal-desc {
+      font-size: 15px;
+      color: #475569;
+      line-height: 1.6;
+      margin-bottom: 24px;
     }
   </style>
 </head>
 <body>
-  <div class="phone-frame">
 
-    <!-- 1. 手機首頁 -->
-    <div id="setup-view">
+  <!-- 1. 任務啟動首頁 -->
+  <div id="setup-screen">
+    <div class="logo-badge">FATE BINDER · 命運共同體</div>
+    <div class="resume-badge" id="resume-notice">
+      ⏳ 偵測到上次有「中途離線未完成」的任務！<br>本次必須先完成上次沒做完的項目才能開始新任務。
+    </div>
+    <h1 id="setup-heading">別害戰友一起拖延</h1>
+    <p class="subtitle">只有倒數結束且<strong>全程無違規</strong>，系統才會判定完成。<br>若有急事可按「中途有事離線」，但下次進來必須先完成上次未完成項目。</p>
+
+    <div class="input-group">
+      <label for="task-input" id="task-label">你現在拖著不想做的事 / 讀書內容</label>
+      <input type="text" id="task-input" placeholder="例如：算數B三角函數、寫英文閱讀..." value="寫英文閱讀筆記" />
+    </div>
+
+    <div class="input-group">
+      <label>選擇專注綁定時長</label>
+      <div class="time-options">
+        <button class="time-btn active" data-mins="15">15 分鐘</button>
+        <button class="time-btn" data-mins="25">25 分鐘</button>
+        <button class="time-btn" data-mins="45">45 分鐘</button>
+      </div>
+    </div>
+
+    <div class="privacy-box">
+      <span>🔒</span>
       <div>
-        <span class="top-pill">FATE BINDER · 手機版</span>
-        <h1 class="setup-title">別害戰友一起拖延</h1>
-        <p class="setup-sub">匿名綁定一位正在拖延的人，一起倒數。任何一方分心或切出畫面，雙方進度同時歸零。</p>
-
-        <div class="card-box">
-          <label class="field-label" for="m-task">你現在拖著不想做的事</label>
-          <input class="task-input" id="m-task" type="text" value="寫英文閱讀筆記" placeholder="輸入想完成的任務..." />
-        </div>
-
-        <div class="card-box">
-          <label class="field-label">綁定專注時間</label>
-          <div class="dur-row">
-            <button class="dur-btn active" data-m="15">15 分鐘</button>
-            <button class="dur-btn" data-m="25">25 分鐘</button>
-            <button class="dur-btn" data-m="45">45 分鐘</button>
-          </div>
-        </div>
-
-        <div class="privacy-note">
-          🔒 <strong>鏡頭監督隱私說明：</strong>專注期間會開啟鏡頭由系統 AI 偵測是否分心或離開，<strong>僅系統與你自己看得到</strong>，影像不上傳，對方也完全看不到。
-        </div>
-      </div>
-
-      <button class="cta-btn" id="m-start-btn">配對戰友並開啟監督</button>
-    </div>
-
-    <!-- 配對畫面 -->
-    <div id="matching-view">
-      <div class="loader"></div>
-      <h2 style="font-size: 18px; margin-bottom: 6px;">正在配對拖延戰友...</h2>
-      <p style="font-size: 13px; color: #64748b;">準備開啟本地 AI 鏡頭監督</p>
-    </div>
-
-    <!-- 警告橫幅 -->
-    <div id="warn-toast">⚠️ 偵測到離開畫面！5 秒內未回來將連累戰友失敗！</div>
-
-    <!-- 2. 雙人專注主畫面 -->
-    <div id="focus-view">
-      <!-- 上半部：戰友 -->
-      <div class="top-partner">
-        <span class="role-badge" id="m-partner-name">您的戰友 #5028</span>
-
-        <div class="partner-center">
-          <div class="glow-circle">
-            <span class="partner-avatar">🧑‍💻</span>
-          </div>
-          <div class="partner-status">專注中 (對方畫面已隱藏)</div>
-          <div class="partner-goal" id="m-partner-goal">目標：算數學練習題</div>
-        </div>
-
-        <div class="cheer-row">
-          <button class="mini-cheer" onclick="mCheer('🔥 加油')">🔥 加油</button>
-          <button class="mini-cheer" onclick="mCheer('⏳ 撐住')">⏳ 撐住</button>
-          <button class="mini-cheer" onclick="mCheer('💪 快好了')">💪 快好了</button>
-        </div>
-      </div>
-
-      <!-- 中央命運連線 -->
-      <div class="link-bar" id="m-link-bar"></div>
-
-      <!-- 下半部：您 -->
-      <div class="bottom-user" id="m-user-panel">
-        <div class="user-top-line">
-          <span class="role-badge">您</span>
-          <span id="m-bubble" style="font-size: 12px; font-weight: 700; color: #0f172a;"></span>
-        </div>
-
-        <div class="user-main-row">
-          <div class="ring-wrap">
-            <svg class="ring-svg" width="152" height="152">
-              <circle class="ring-bg" cx="76" cy="76" r="66"></circle>
-              <circle class="ring-fg" id="m-ring-fg" cx="76" cy="76" r="66"></circle>
-            </svg>
-            <div class="countdown-num" id="m-timer">15:00</div>
-          </div>
-
-          <div class="cam-column">
-            <div class="cam-ring" id="m-cam-ring">
-              <video id="cam-video" autoplay playsinline muted></video>
-            </div>
-            <div class="ai-tag" id="m-ai-tag">系統 AI 監督中</div>
-            <div class="cam-sub">僅系統可見<br>對方看不到</div>
-          </div>
-        </div>
-
-        <div class="task-footer">
-          <div class="my-task-label" id="m-my-task-show">任務：寫英文閱讀筆記</div>
-          <div class="demo-actions">
-            <button class="demo-btn" onclick="mFail('你分心滑手機了，連累戰友一起失敗！')">違規測試</button>
-            <button class="demo-btn" onclick="mWin()">完成</button>
-          </div>
-        </div>
+        <strong>嚴格完成與離線規則：</strong><br>
+        系統會偵測人臉是否離開鏡頭與讀書專注狀態；違規會響鈴並重新計時且記為「有違規」，唯有<strong>計時歸零且無違規</strong>才算完成。
       </div>
     </div>
 
-    <!-- 3. 結算彈窗 -->
-    <div id="end-modal">
-      <div class="end-box">
-        <div id="m-end-emoji" style="font-size: 46px; margin-bottom: 10px;">💔</div>
-        <h2 id="m-end-title" style="font-size: 20px; margin-bottom: 8px;">任務失敗</h2>
-        <p id="m-end-desc" style="font-size: 14px; color: #475569; line-height: 1.5; margin-bottom: 20px;"></p>
-        <button class="cta-btn" onclick="location.reload()">再來一局</button>
-      </div>
-    </div>
-
+    <button class="start-btn" id="btn-start">尋找拖延戰友並綁定</button>
   </div>
 
+  <!-- 配對過場畫面 -->
+  <div id="matching-overlay">
+    <div class="spinner"></div>
+    <h2 style="margin-bottom: 8px;">正在綁定拖延戰友...</h2>
+    <p style="color: #64748b; font-size: 14px;">正在啟動本地端鏡頭人臉與讀書專注偵測</p>
+  </div>
+
+  <!-- 警告橫幅 -->
+  <div id="warning-banner">⚠️ 偵測到分心或離開畫面！時間已重新計時！</div>
+
+  <!-- 2. 雙人專注主畫面 -->
+  <div id="focus-screen">
+    <div class="energy-beam" id="energy-beam"></div>
+
+    <!-- 左側：戰友區域 -->
+    <div class="partner-panel">
+      <div class="panel-header">
+        <span class="partner-tag" id="partner-id">匿名戰友 #8492</span>
+      </div>
+
+      <div class="silhouette-stage">
+        <div class="glow-aura">
+          <div class="avatar-icon">🧑‍💻</div>
+        </div>
+        <div class="status-pill">
+          <span class="dot-green"></span>
+          <span>系統 AI 確認：專注中 (對方畫面已隱藏)</span>
+        </div>
+        <div class="partner-task-box" id="partner-task-text">
+          戰友目標：整理期中筆記
+        </div>
+      </div>
+
+      <div class="bubble-area" id="bubble-area"></div>
+
+      <div class="cheer-bar">
+        <button class="cheer-btn" onclick="sendCheer('🔥 加油！')">🔥 加油</button>
+        <button class="cheer-btn" onclick="sendCheer('⏳ 撐住！')">⏳ 撐住</button>
+        <button class="cheer-btn" onclick="sendCheer('💪 快結束了')">💪 快結束了</button>
+      </div>
+    </div>
+
+    <!-- 右側：個人專注與 AI 監督面板 -->
+    <div class="user-panel" id="user-panel">
+      <div class="panel-header">
+        <span class="partner-tag" style="color: #1e8449;">你（命運綁定中・同位戰友）</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="timer-wrapper">
+          <svg class="timer-svg" width="230" height="230">
+            <circle class="timer-circle-bg" cx="115" cy="115" r="100"></circle>
+            <circle class="timer-circle-progress" id="progress-ring" cx="115" cy="115" r="100"></circle>
+          </svg>
+          <div class="timer-text" id="timer-display">15:00</div>
+        </div>
+
+        <div class="my-task-display">
+          <span>你目前的任務</span>
+          <strong id="display-my-task">寫英文閱讀筆記</strong>
+        </div>
+
+        <div class="status-pills-row">
+          <div class="study-monitor-pill" id="study-status-pill">
+            📚 讀書/鏡頭偵測：等待鏡頭啟動...
+          </div>
+          <div class="violation-count-pill" id="violation-count-pill">
+            ✅ 目前違規次數：0 次（需全程 0 違規至倒數結束）
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-controls">
+        <button class="btn-outline" id="btn-mute" onclick="toggleMute()">🔊 音效：開</button>
+        <button class="btn-outline btn-offline" onclick="goOfflineWithPendingTask()">🚪 中途有事離線</button>
+        <button class="btn-outline" onclick="handleResetPenalty('模擬離開鏡頭／未在讀書')">🧪 測試：違規重計</button>
+      </div>
+
+      <!-- 本地端 AI 鏡頭監督視訊窗 -->
+      <div class="webcam-box">
+        <div class="webcam-circle" id="webcam-circle">
+          <video id="webcam-video" autoplay playsinline muted></video>
+        </div>
+        <div class="ai-badge" id="ai-status-badge">🟢 系統 AI 監督中</div>
+        <div class="privacy-mini-note">🔒 僅系統可見，戰友看不到</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 結算彈窗（由系統判定完成或未達無違規完成） -->
+  <div id="result-modal">
+    <div class="modal-card">
+      <div class="modal-icon" id="modal-icon">🙌</div>
+      <div class="modal-title" id="modal-title">系統判定完成！</div>
+      <div class="modal-desc" id="modal-desc">太棒了！你全程無違規走完倒數，系統已認定完成。</div>
+      <button class="start-btn" id="modal-action-btn" onclick="handleModalAction()">回到首頁</button>
+    </div>
+  </div>
+
+  <!-- 隱藏畫布：用於本地端分析人臉與讀書動作 -->
+  <canvas id="vision-canvas" width="160" height="120" style="display:none;"></canvas>
+
   <script>
-    let mins = 15;
-    let totalSec = 900;
-    let leftSec = 900;
-    let tickId = null;
-    let active = false;
-    let awayTimer = null;
-    let mediaStream = null;
+    const STORAGE_KEY = "fate_binder_pending_task_v1";
 
-    const goals = ["背 25 個單字", "整理歷史重點", "寫完一份作業", "讀完一章課文"];
+    let selectedMinutes = 15;
+    let totalSeconds = 15 * 60;
+    let remainingSeconds = totalSeconds;
+    let violationCount = 0;
+    let lockedTaskName = null; // 若有上次未完成任務，強制鎖定此任務名稱
 
-    document.querySelectorAll('.dur-btn').forEach(b => {
-      b.addEventListener('click', () => {
-        document.querySelectorAll('.dur-btn').forEach(x => x.classList.remove('active'));
-        b.classList.add('active');
-        mins = parseInt(b.dataset.m, 10);
+    let timerInterval = null;
+    let visionInterval = null;
+    let isRunning = false;
+    let soundEnabled = true;
+    let streamRef = null;
+
+    let noPresenceSeconds = 0;
+    let lowActivitySeconds = 0;
+    let prevFrameData = null;
+    let faceDetector = null;
+    let bannerTimeout = null;
+
+    const partnerTasks = [
+      "讀完 15 頁原文書",
+      "寫出程式作業第一題",
+      "整理房間書桌",
+      "背完 30 個單字",
+      "修改專題簡報"
+    ];
+
+    // ================= 檢查上次是否有「中途有事離線」未完成任務 =================
+    function initPendingTaskState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        if (saved && saved.task && saved.remainingSeconds > 0) {
+          lockedTaskName = saved.task;
+          selectedMinutes = saved.selectedMinutes || 15;
+          totalSeconds = saved.totalSeconds || selectedMinutes * 60;
+          remainingSeconds = saved.remainingSeconds;
+          violationCount = saved.violationCount || 0;
+
+          const input = document.getElementById('task-input');
+          input.value = lockedTaskName;
+          input.disabled = true;
+
+          document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.disabled = true;
+            btn.classList.toggle('active', parseInt(btn.dataset.mins, 10) === selectedMinutes);
+          });
+
+          document.getElementById('resume-notice').style.display = 'block';
+          document.getElementById('setup-heading').textContent = '先完成上次沒做完的事';
+          document.getElementById('task-label').textContent = '已鎖定上次未完成任務（完成前無法更改）';
+          document.getElementById('btn-start').textContent = `繼續完成「${lockedTaskName}」`;
+        }
+      } catch (e) {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
+    function savePendingTask(taskText) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        task: taskText,
+        selectedMinutes,
+        totalSeconds,
+        remainingSeconds,
+        violationCount
+      }));
+    }
+
+    function clearPendingTask() {
+      localStorage.removeItem(STORAGE_KEY);
+      lockedTaskName = null;
+    }
+
+    // ================= 音效系統 =================
+    function playAlertSound(type = "reset") {
+      if (!soundEnabled) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+
+        const notes = type === "success"
+          ? [523.25, 659.25, 783.99]
+          : [440, 349.23, 293.66];
+
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = type === "success" ? "triangle" : "sawtooth";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.14);
+
+          gain.gain.setValueAtTime(0.12, now + idx * 0.14);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.14 + 0.13);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + idx * 0.14);
+          osc.stop(now + idx * 0.14 + 0.14);
+        });
+      } catch (e) {}
+    }
+
+    function toggleMute() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('btn-mute').textContent = soundEnabled ? "🔊 音效：開" : "🔇 音效：關";
+    }
+
+    // ================= 時間選擇與啟動 =================
+    document.querySelectorAll('.time-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (lockedTaskName) return;
+        document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedMinutes = parseInt(btn.dataset.mins, 10);
+        totalSeconds = selectedMinutes * 60;
+        remainingSeconds = totalSeconds;
       });
     });
 
-    document.getElementById('m-start-btn').addEventListener('click', async () => {
-      const task = document.getElementById('m-task').value.trim();
-      if (!task) return alert("請輸入任務名稱！");
+    document.getElementById('btn-start').addEventListener('click', async () => {
+      const taskVal = lockedTaskName || document.getElementById('task-input').value.trim();
+      if (!taskVal) {
+        alert("請先輸入你現在拖著不想做的事！");
+        return;
+      }
 
-      document.getElementById('m-my-task-show').textContent = `任務：${task}`;
-      document.getElementById('setup-view').style.display = 'none';
-      document.getElementById('matching-view').style.display = 'flex';
+      if (!lockedTaskName) {
+        totalSeconds = selectedMinutes * 60;
+        remainingSeconds = totalSeconds;
+        violationCount = 0;
+      }
+
+      document.getElementById('display-my-task').textContent = taskVal;
+      updateViolationBadge();
+      document.getElementById('setup-screen').style.display = 'none';
+      document.getElementById('matching-overlay').style.display = 'flex';
+
+      if ("FaceDetector" in window) {
+        try {
+          faceDetector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
+        } catch (e) {
+          faceDetector = null;
+        }
+      }
 
       try {
-        mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user" },
+        streamRef = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user", width: 320, height: 240 },
           audio: false
         });
-        document.getElementById('cam-video').srcObject = mediaStream;
-      } catch (e) {
-        document.getElementById('m-ai-tag').textContent = "模擬監督 (無鏡頭)";
+        document.getElementById('webcam-video').srcObject = streamRef;
+      } catch (err) {
+        document.getElementById('ai-status-badge').textContent = "🟡 未取得鏡頭權限";
+        document.getElementById('study-status-pill').textContent = "⚠️ 未開鏡頭：僅偵測是否離開網頁";
       }
 
       setTimeout(() => {
-        document.getElementById('matching-view').style.display = 'none';
-        document.getElementById('focus-view').style.display = 'flex';
-        document.getElementById('m-partner-name').textContent = `您的戰友 #${Math.floor(1000 + Math.random() * 9000)}`;
-        document.getElementById('m-partner-goal').textContent = `目標：${goals[Math.floor(Math.random() * goals.length)]}`;
-        runCountdown();
+        document.getElementById('matching-overlay').style.display = 'none';
+        document.getElementById('focus-screen').style.display = 'grid';
+
+        const randomId = Math.floor(1000 + Math.random() * 9000);
+        const randomTask = partnerTasks[Math.floor(Math.random() * partnerTasks.length)];
+        document.getElementById('partner-id').textContent = `匿名戰友 #${randomId}`;
+        document.getElementById('partner-task-text').textContent = `戰友目標：${randomTask}`;
+
+        startTimer();
+        startVisionLoop();
+        startPartnerAutoCheer();
       }, 1500);
     });
 
-    function runCountdown() {
-      active = true;
-      totalSec = mins * 60;
-      leftSec = totalSec;
-      const ring = document.getElementById('m-ring-fg');
-      const len = 415;
-      renderTime();
+    function updateViolationBadge() {
+      const el = document.getElementById('violation-count-pill');
+      if (violationCount === 0) {
+        el.classList.remove('has-violation');
+        el.textContent = "✅ 目前違規次數：0 次（需全程 0 違規至倒數結束）";
+      } else {
+        el.classList.add('has-violation');
+        el.textContent = `⚠️ 本輪已違規 ${violationCount} 次（倒數結束時需無違規才算完成）`;
+      }
+    }
 
-      tickId = setInterval(() => {
-        leftSec--;
-        renderTime();
-        ring.style.strokeDashoffset = len - (leftSec / totalSec) * len;
-        if (leftSec <= 0) mWin();
+    // ================= 計時與系統結算 =================
+    function startTimer() {
+      isRunning = true;
+      updateTimerDisplay();
+
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (!isRunning) return;
+        remainingSeconds--;
+        updateTimerDisplay();
+
+        if (remainingSeconds <= 0) {
+          evaluateSystemCompletion();
+        }
       }, 1000);
     }
 
-    function renderTime() {
-      const m = Math.floor(leftSec / 60);
-      const s = leftSec % 60;
-      document.getElementById('m-timer').textContent =
-        `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    function resetTimerOnly() {
+      totalSeconds = selectedMinutes * 60;
+      remainingSeconds = totalSeconds;
+      violationCount++;
+      noPresenceSeconds = 0;
+      lowActivitySeconds = 0;
+      updateViolationBadge();
+      updateTimerDisplay();
     }
 
-    function mCheer(txt) {
-      const bubble = document.getElementById('m-bubble');
-      bubble.textContent = `已送出 ${txt}`;
-      setTimeout(() => { if (bubble.textContent === `已送出 ${txt}`) bubble.textContent = ''; }, 2500);
+    function updateTimerDisplay() {
+      const mins = Math.floor(remainingSeconds / 60);
+      const secs = remainingSeconds % 60;
+      document.getElementById('timer-display').textContent =
+        `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+      const ring = document.getElementById('progress-ring');
+      const circumference = 628;
+      ring.style.strokeDashoffset = circumference - (remainingSeconds / totalSeconds) * circumference;
     }
 
-    // 切出 App / 換分頁 / 鎖定螢幕偵測
+    function handleResetPenalty(reasonText) {
+      if (!isRunning) return;
+      playAlertSound("reset");
+      resetTimerOnly();
+
+      const banner = document.getElementById('warning-banner');
+      banner.textContent = `🔔 ${reasonText}！已響鈴並重新計時（第 ${violationCount} 次違規，保留同一位戰友）`;
+      banner.style.display = 'block';
+
+      document.getElementById('energy-beam').classList.add('danger');
+      document.getElementById('user-panel').classList.add('warning-mode');
+      document.getElementById('webcam-circle').classList.add('danger');
+      document.getElementById('ai-status-badge').textContent = "🔴 已重計時";
+      document.getElementById('ai-status-badge').style.color = "#ff6b6b";
+
+      if (bannerTimeout) clearTimeout(bannerTimeout);
+      bannerTimeout = setTimeout(() => {
+        banner.style.display = 'none';
+        document.getElementById('energy-beam').classList.remove('danger');
+        document.getElementById('user-panel').classList.remove('warning-mode');
+        document.getElementById('webcam-circle').classList.remove('danger');
+        document.getElementById('ai-status-badge').textContent = "🟢 系統 AI 監督中";
+        document.getElementById('ai-status-badge').style.color = "#2ecc71";
+      }, 4500);
+    }
+
+    // 中途有事離線：保留未完成任務，下次進來必須先完成這項
+    function goOfflineWithPendingTask() {
+      const currentTask = document.getElementById('display-my-task').textContent.trim();
+      savePendingTask(currentTask);
+
+      isRunning = false;
+      clearInterval(timerInterval);
+      clearInterval(visionInterval);
+      if (streamRef) streamRef.getTracks().forEach(t => t.stop());
+
+      alert(`已記錄「${currentTask}」尚未完成並離線。\n下次打開 App 時，必須先完成這項任務才能開始新任務！`);
+      location.reload();
+    }
+
+    // 離開網頁 -> 重新計時
     document.addEventListener('visibilitychange', () => {
-      if (!active) return;
+      if (!isRunning) return;
       if (document.hidden) {
-        document.getElementById('warn-toast').style.display = 'block';
-        document.getElementById('m-link-bar').classList.add('alert');
-        document.getElementById('m-user-panel').classList.add('alert');
-        document.getElementById('m-cam-ring').classList.add('alert');
-        awayTimer = setTimeout(() => {
-          mFail("你離開畫面超過 5 秒，連坐機制啟動，害戰友一起失敗了！");
-        }, 5000);
-      } else {
-        clearTimeout(awayTimer);
-        document.getElementById('warn-toast').style.display = 'none';
-        document.getElementById('m-link-bar').classList.remove('alert');
-        document.getElementById('m-user-panel').classList.remove('alert');
-        document.getElementById('m-cam-ring').classList.remove('alert');
+        handleResetPenalty("偵測到你離開網頁或去做別的事");
       }
     });
 
-    function stopMedia() {
-      if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+    // ================= 本地端鏡頭人臉與讀書狀態偵測 =================
+    function startVisionLoop() {
+      const video = document.getElementById('webcam-video');
+      const canvas = document.getElementById('vision-canvas');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      const pill = document.getElementById('study-status-pill');
+
+      if (visionInterval) clearInterval(visionInterval);
+
+      visionInterval = setInterval(async () => {
+        if (!isRunning || !streamRef || video.readyState < 2) return;
+
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = frame.data;
+
+        let brightnessSum = 0;
+        let diffSum = 0;
+        const pixelCount = data.length / 4;
+
+        for (let i = 0; i < data.length; i += 4) {
+          const lum = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+          brightnessSum += lum;
+          if (prevFrameData) {
+            const prevLum = 0.299 * prevFrameData[i] + 0.587 * prevFrameData[i + 1] + 0.114 * prevFrameData[i + 2];
+            diffSum += Math.abs(lum - prevLum);
+          }
+        }
+        prevFrameData = new Uint8ClampedArray(data);
+
+        const avgBrightness = brightnessSum / pixelCount;
+        const avgDiff = diffSum / pixelCount;
+
+        let hasFace = null;
+        if (faceDetector) {
+          try {
+            const faces = await faceDetector.detect(canvas);
+            hasFace = faces.length > 0;
+          } catch (e) {
+            hasFace = null;
+          }
+        }
+
+        const likelyAway = (avgBrightness < 22) || (hasFace === false && avgDiff < 1.2);
+
+        if (likelyAway) {
+          noPresenceSeconds++;
+          pill.classList.add('bad');
+          pill.textContent = `⚠️ 偵測不到人臉／離開鏡頭（${noPresenceSeconds}s）`;
+
+          if (noPresenceSeconds >= 4) {
+            handleResetPenalty("偵測到你離開鏡頭畫面");
+          }
+        } else {
+          noPresenceSeconds = 0;
+          if (avgDiff < 0.75) {
+            lowActivitySeconds++;
+          } else {
+            lowActivitySeconds = 0;
+          }
+
+          pill.classList.remove('bad');
+          if (hasFace === true) {
+            pill.textContent = lowActivitySeconds >= 12
+              ? "📖 鏡頭已鎖定人臉（疑似定格發呆，請保持讀書動作）"
+              : "📚 系統已抓到人臉・讀書專注偵測中";
+          } else {
+            pill.textContent = "📚 鏡頭畫面正常・讀書狀態偵測中";
+          }
+
+          if (lowActivitySeconds >= 25) {
+            handleResetPenalty("長時間無讀書/專注動作，疑似分心或離開");
+          }
+        }
+      }, 1000);
     }
 
-    function mFail(reason) {
-      active = false;
-      clearInterval(tickId);
-      clearTimeout(awayTimer);
-      stopMedia();
-      document.getElementById('m-end-emoji').textContent = "💔";
-      document.getElementById('m-end-title').textContent = "連線斷裂，連坐失敗";
-      document.getElementById('m-end-desc').textContent = reason;
-      document.getElementById('end-modal').style.display = 'flex';
+    // ================= 戰友互動與系統嚴格判定 =================
+    function sendCheer(text) {
+      showBubble(`你發送了：${text}`);
+      setTimeout(() => showBubble(`戰友回應：👍 收到，一起撐住！`), 1600);
     }
 
-    function mWin() {
-      active = false;
-      clearInterval(tickId);
-      clearTimeout(awayTimer);
-      stopMedia();
-      document.getElementById('m-end-emoji').textContent = "🙌";
-      document.getElementById('m-end-title').textContent = "挑戰成功！";
-      document.getElementById('m-end-desc').textContent = `你和戰友成功撐過 ${mins} 分鐘，沒有互相拖累！`;
-      document.getElementById('end-modal').style.display = 'flex';
+    function showBubble(msg) {
+      const area = document.getElementById('bubble-area');
+      area.innerHTML = `<div class="reaction-bubble">${msg}</div>`;
+      setTimeout(() => {
+        if (area.innerHTML.includes(msg)) area.innerHTML = '';
+      }, 3200);
     }
+
+    function startPartnerAutoCheer() {
+      setInterval(() => {
+        if (!isRunning) return;
+        const msgs = ["戰友發送了：🔥 加油！", "戰友正在認真專注中...", "戰友發送了：⏳ 撐住！"];
+        showBubble(msgs[Math.floor(Math.random() * msgs.length)]);
+      }, 25000);
+    }
+
+    function evaluateSystemCompletion() {
+      isRunning = false;
+      clearInterval(timerInterval);
+      clearInterval(visionInterval);
+      if (streamRef) streamRef.getTracks().forEach(t => t.stop());
+
+      const currentTask = document.getElementById('display-my-task').textContent.trim();
+
+      if (violationCount === 0) {
+        // 真正走完倒數且全程無違規 -> 系統判定完成，解除鎖定
+        clearPendingTask();
+        playAlertSound("success");
+        document.getElementById('modal-icon').textContent = "🙌";
+        document.getElementById('modal-title').textContent = "系統判定完成！";
+        document.getElementById('modal-title').style.color = "#27ae60";
+        document.getElementById('modal-desc').textContent =
+          `恭喜！「${currentTask}」已走完 ${selectedMinutes} 分鐘且全程 0 違規，系統正式認定完成！`;
+        document.getElementById('modal-action-btn').textContent = "開始新任務";
+      } else {
+        // 雖然時間走完，但期間有違規重計時紀錄 -> 不算無違規完成，保留為未完成任務
+        remainingSeconds = selectedMinutes * 60;
+        savePendingTask(currentTask);
+        playAlertSound("reset");
+        document.getElementById('modal-icon').textContent = "⚠️";
+        document.getElementById('modal-title').textContent = "尚未達成「全程無違規」完成";
+        document.getElementById('modal-title').style.color = "#d97706";
+        document.getElementById('modal-desc').textContent =
+          `本輪共有 ${violationCount} 次違規紀錄，系統尚未認定完成。「${currentTask}」仍列為未完成，下次進來必須先完成這項！`;
+        document.getElementById('modal-action-btn').textContent = "返回並重新挑戰此任務";
+      }
+
+      document.getElementById('result-modal').style.display = 'flex';
+    }
+
+    function handleModalAction() {
+      location.reload();
+    }
+
+    // 頁面載入時檢查上次未完成任務
+    initPendingTaskState();
   </script>
 </body>
 </html>
