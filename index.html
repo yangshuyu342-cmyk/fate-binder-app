@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Fate Binder 手機版 — 命運共同體</title>
+  <style>
+    :root {
+      --partner-bg: #a7c7e7;
+      --partner-grad: linear-gradient(180deg, #b8d5f0 0%, #9ec2e6 100%);
+      --user-bg: #a8d5ba;
+      --user-grad: linear-gradient(180deg, #bce3cc 0%, #9cd0b1 100%);
+      --danger: #ff5e5e;
+      --ink: #1e293b;
+      --muted: #475569;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: #e2e8f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* 手機外框容器（在手機上滿版，在電腦上看像手機螢幕） */
+    .phone-frame {
+      width: 100%;
+      max-width: 414px;
+      height: 100vh;
+      max-height: 860px;
+      background: #ffffff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (min-width: 450px) {
+      .phone-frame {
+        height: 92vh;
+        border-radius: 36px;
+        border: 8px solid #1e293b;
+      }
+    }
+
+    /* ================= 1. 手機首頁：任務設定 ================= */
+    #setup-view {
+      flex: 1;
+      padding: 28px 22px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #f8fafc;
+      overflow-y: auto;
+    }
+
+    .top-pill {
+      display: inline-block;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .setup-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .setup-sub {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .card-box {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+      margin-bottom: 14px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    .task-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .task-input:focus {
+      border-color: #0284c7;
+    }
+
+    .dur-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .dur-btn {
+      padding: 10px 6px;
+      border-radius: 12px;
+      border: 1.5px solid #cbd5e1;
+      background: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .dur-btn.active {
+      border-color: #16a34a;
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .privacy-note {
+      background: #f1f5f9;
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 12px;
+      color: #334155;
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+
+    .cta-btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #ff7e5f, #feb47b);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(255, 126, 95, 0.3);
+    }
+
+    /* ================= 配對載入畫面 ================= */
+    #matching-view {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.96);
+      z-index: 40;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .loader {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #0284c7;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ================= 2. 手機雙人專注主畫面（上下分割） ================= */
+    #focus-view {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+    }
+
+    /* 上半部：您的戰友 */
+    .top-partner {
+      flex: 0.92;
+      background: var(--partner-grad);
+      padding: 14px 18px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    .role-badge {
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+
+    .partner-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .glow-circle {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 243, 176, 0.95) 0%, rgba(255, 243, 176, 0) 72%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: pulse 2.8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    .partner-avatar {
+      font-size: 46px;
+    }
+
+    .partner-status {
+      background: #1e293b;
+      color: #f8fafc;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-top: 4px;
+    }
+
+    .partner-goal {
+      margin-top: 6px;
+      font-size: 12.5px;
+      color: #1e293b;
+      background: rgba(255, 255, 255, 0.65);
+      padding: 4px 12px;
+      border-radius: 10px;
+    }
+
+    .cheer-row {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .mini-cheer {
+      background: rgba(255, 255, 255, 0.88);
+      border: none;
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    /* 中央命運連線條 */
+    .link-bar {
+      height: 6px;
+      width: 100%;
+      background: linear-gradient(90deg, #38bdf8, #22c55e, #38bdf8);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
+      z-index: 5;
+      transition: all 0.25s;
+    }
+
+    .link-bar.alert {
+      background: var(--danger);
+      box-shadow: 0 0 16px var(--danger);
+    }
+
+    /* 下半部：您（計時器 + 鏡頭 AI 監督） */
+    .bottom-user {
+      flex: 1.08;
+      background: var(--user-grad);
+      padding: 12px 18px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: background 0.25s;
+    }
+
+    .bottom-user.alert {
+      background: linear-gradient(180deg, #fecaca 0%, #fca5a5 100%);
+    }
+
+    .user-top-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .user-main-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: auto 0;
+    }
+
+    /* 圓形倒數計時器 */
+    .ring-wrap {
+      position: relative;
+      width: 152px;
+      height: 152px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .ring-svg {
+      position: absolute;
+      inset: 0;
+      transform: rotate(-90deg);
+    }
+
+    .ring-bg {
+      fill: rgba(255, 255, 255, 0.88);
+      stroke: #e2e8f0;
+      stroke-width: 8;
+    }
+
+    .ring-fg {
+      fill: none;
+      stroke: #ff5e5e;
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 415;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .countdown-num {
+      position: relative;
+      font-family: "JetBrains Mono", "Courier New", monospace;
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    /* 右側鏡頭監督區（只有系統與自己看得到，戰友看不到） */
+    .cam-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    .cam-ring {
+      width: 104px;
+      height: 104px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3.5px solid #16a34a;
+      background: #1e293b;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+    }
+
+    .cam-ring.alert {
+      border-color: var(--danger);
+    }
+
+    #cam-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    .ai-tag {
+      margin-top: -10px;
+      background: #1e293b;
+      color: #4ade80;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      z-index: 2;
+    }
+
+    .cam-sub {
+      font-size: 10.5px;
+      color: #1e293b;
+      margin-top: 4px;
+      text-align: center;
+      line-height: 1.25;
+      font-weight: 600;
+    }
+
+    .task-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.72);
+      padding: 8px 12px;
+      border-radius: 12px;
+    }
+
+    .my-task-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .demo-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .demo-btn {
+      border: none;
+      background: #e2e8f0;
+      color: #1e293b;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* 警告提示條 */
+    #warn-toast {
+      display: none;
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      background: var(--danger);
+      color: #fff;
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 12px;
+      text-align: center;
+      z-index: 60;
+      box-shadow: 0 8px 20px rgba(255, 94, 94, 0.4);
+    }
+
+    /* ================= 結算彈窗 ================= */
+    #end-modal {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      z-index: 80;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .end-box {
+      background: #fff;
+      border-radius: 22px;
+      padding: 28px 22px;
+      text-align: center;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+
+    <!-- 1. 手機首頁 -->
+    <div id="setup-view">
+      <div>
+        <span class="top-pill">FATE BINDER · 手機版</span>
+        <h1 class="setup-title">別害戰友一起拖延</h1>
+        <p class="setup-sub">匿名綁定一位正在拖延的人，一起倒數。任何一方分心或切出畫面，雙方進度同時歸零。</p>
+
+        <div class="card-box">
+          <label class="field-label" for="m-task">你現在拖著不想做的事</label>
+          <input class="task-input" id="m-task" type="text" value="寫英文閱讀筆記" placeholder="輸入想完成的任務..." />
+        </div>
+
+        <div class="card-box">
+          <label class="field-label">綁定專注時間</label>
+          <div class="dur-row">
+            <button class="dur-btn active" data-m="15">15 分鐘</button>
+            <button class="dur-btn" data-m="25">25 分鐘</button>
+            <button class="dur-btn" data-m="45">45 分鐘</button>
+          </div>
+        </div>
+
+        <div class="privacy-note">
+          🔒 <strong>鏡頭監督隱私說明：</strong>專注期間會開啟鏡頭由系統 AI 偵測是否分心或離開，<strong>僅系統與你自己看得到</strong>，影像不上傳，對方也完全看不到。
+        </div>
+      </div>
+
+      <button class="cta-btn" id="m-start-btn">配對戰友並開啟監督</button>
+    </div>
+
+    <!-- 配對畫面 -->
+    <div id="matching-view">
+      <div class="loader"></div>
+      <h2 style="font-size: 18px; margin-bottom: 6px;">正在配對拖延戰友...</h2>
+      <p style="font-size: 13px; color: #64748b;">準備開啟本地 AI 鏡頭監督</p>
+    </div>
+
+    <!-- 警告橫幅 -->
+    <div id="warn-toast">⚠️ 偵測到離開畫面！5 秒內未回來將連累戰友失敗！</div>
+
+    <!-- 2. 雙人專注主畫面 -->
+    <div id="focus-view">
+      <!-- 上半部：戰友 -->
+      <div class="top-partner">
+        <span class="role-badge" id="m-partner-name">您的戰友 #5028</span>
+
+        <div class="partner-center">
+          <div class="glow-circle">
+            <span class="partner-avatar">🧑‍💻</span>
+          </div>
+          <div class="partner-status">專注中 (對方畫面已隱藏)</div>
+          <div class="partner-goal" id="m-partner-goal">目標：算數學練習題</div>
+        </div>
+
+        <div class="cheer-row">
+          <button class="mini-cheer" onclick="mCheer('🔥 加油')">🔥 加油</button>
+          <button class="mini-cheer" onclick="mCheer('⏳ 撐住')">⏳ 撐住</button>
+          <button class="mini-cheer" onclick="mCheer('💪 快好了')">💪 快好了</button>
+        </div>
+      </div>
+
+      <!-- 中央命運連線 -->
+      <div class="link-bar" id="m-link-bar"></div>
+
+      <!-- 下半部：您 -->
+      <div class="bottom-user" id="m-user-panel">
+        <div class="user-top-line">
+          <span class="role-badge">您</span>
+          <span id="m-bubble" style="font-size: 12px; font-weight: 700; color: #0f172a;"></span>
+        </div>
+
+        <div class="user-main-row">
+          <div class="ring-wrap">
+            <svg class="ring-svg" width="152" height="152">
+              <circle class="ring-bg" cx="76" cy="76" r="66"></circle>
+              <circle class="ring-fg" id="m-ring-fg" cx="76" cy="76" r="66"></circle>
+            </svg>
+            <div class="countdown-num" id="m-timer">15:00</div>
+          </div>
+
+          <div class="cam-column">
+            <div class="cam-ring" id="m-cam-ring">
+              <video id="cam-video" autoplay playsinline muted></video>
+            </div>
+            <div class="ai-tag" id="m-ai-tag">系統 AI 監督中</div>
+            <div class="cam-sub">僅系統可見<br>對方看不到</div>
+          </div>
+        </div>
+
+        <div class="task-footer">
+          <div class="my-task-label" id="m-my-task-show">任務：寫英文閱讀筆記</div>
+          <div class="demo-actions">
+            <button class="demo-btn" onclick="mFail('你分心滑手機了，連累戰友一起失敗！')">違規測試</button>
+            <button class="demo-btn" onclick="mWin()">完成</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 結算彈窗 -->
+    <div id="end-modal">
+      <div class="end-box">
+        <div id="m-end-emoji" style="font-size: 46px; margin-bottom: 10px;">💔</div>
+        <h2 id="m-end-title" style="font-size: 20px; margin-bottom: 8px;">任務失敗</h2>
+        <p id="m-end-desc" style="font-size: 14px; color: #475569; line-height: 1.5; margin-bottom: 20px;"></p>
+        <button class="cta-btn" onclick="location.reload()">再來一局</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let mins = 15;
+    let totalSec = 900;
+    let leftSec = 900;
+    let tickId = null;
+    let active = false;
+    let awayTimer = null;
+    let mediaStream = null;
+
+    const goals = ["背 25 個單字", "整理歷史重點", "寫完一份作業", "讀完一章課文"];
+
+    document.querySelectorAll('.dur-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.dur-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        mins = parseInt(b.dataset.m, 10);
+      });
+    });
+
+    document.getElementById('m-start-btn').addEventListener('click', async () => {
+      const task = document.getElementById('m-task').value.trim();
+      if (!task) return alert("請輸入任務名稱！");
+
+      document.getElementById('m-my-task-show').textContent = `任務：${task}`;
+      document.getElementById('setup-view').style.display = 'none';
+      document.getElementById('matching-view').style.display = 'flex';
+
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" },
+          audio: false
+        });
+        document.getElementById('cam-video').srcObject = mediaStream;
+      } catch (e) {
+        document.getElementById('m-ai-tag').textContent = "模擬監督 (無鏡頭)";
+      }
+
+      setTimeout(() => {
+        document.getElementById('matching-view').style.display = 'none';
+        document.getElementById('focus-view').style.display = 'flex';
+        document.getElementById('m-partner-name').textContent = `您的戰友 #${Math.floor(1000 + Math.random() * 9000)}`;
+        document.getElementById('m-partner-goal').textContent = `目標：${goals[Math.floor(Math.random() * goals.length)]}`;
+        runCountdown();
+      }, 1500);
+    });
+
+    function runCountdown() {
+      active = true;
+      totalSec = mins * 60;
+      leftSec = totalSec;
+      const ring = document.getElementById('m-ring-fg');
+      const len = 415;
+      renderTime();
+
+      tickId = setInterval(() => {
+        leftSec--;
+        renderTime();
+        ring.style.strokeDashoffset = len - (leftSec / totalSec) * len;
+        if (leftSec <= 0) mWin();
+      }, 1000);
+    }
+
+    function renderTime() {
+      const m = Math.floor(leftSec / 60);
+      const s = leftSec % 60;
+      document.getElementById('m-timer').textContent =
+        `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function mCheer(txt) {
+      const bubble = document.getElementById('m-bubble');
+      bubble.textContent = `已送出 ${txt}`;
+      setTimeout(() => { if (bubble.textContent === `已送出 ${txt}`) bubble.textContent = ''; }, 2500);
+    }
+
+    // 切出 App / 換分頁 / 鎖定螢幕偵測
+    document.addEventListener('visibilitychange', () => {
+      if (!active) return;
+      if (document.hidden) {
+        document.getElementById('warn-toast').style.display = 'block';
+        document.getElementById('m-link-bar').classList.add('alert');
+        document.getElementById('m-user-panel').classList.add('alert');
+        document.getElementById('m-cam-ring').classList.add('alert');
+        awayTimer = setTimeout(() => {
+          mFail("你離開畫面超過 5 秒，連坐機制啟動，害戰友一起失敗了！");
+        }, 5000);
+      } else {
+        clearTimeout(awayTimer);
+        document.getElementById('warn-toast').style.display = 'none';
+        document.getElementById('m-link-bar').classList.remove('alert');
+        document.getElementById('m-user-panel').classList.remove('alert');
+        document.getElementById('m-cam-ring').classList.remove('alert');
+      }
+    });
+
+    function stopMedia() {
+      if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+    }
+
+    function mFail(reason) {
+      active = false;
+      clearInterval(tickId);
+      clearTimeout(awayTimer);
+      stopMedia();
+      document.getElementById('m-end-emoji').textContent = "💔";
+      document.getElementById('m-end-title').textContent = "連線斷裂，連坐失敗";
+      document.getElementById('m-end-desc').textContent = reason;
+      document.getElementById('end-modal').style.display = 'flex';
+    }
+
+    function mWin() {
+      active = false;
+      clearInterval(tickId);
+      clearTimeout(awayTimer);
+      stopMedia();
+      document.getElementById('m-end-emoji').textContent = "🙌";
+      document.getElementById('m-end-title').textContent = "挑戰成功！";
+      document.getElementById('m-end-desc').textContent = `你和戰友成功撐過 ${mins} 分鐘，沒有互相拖累！`;
+      document.getElementById('end-modal').style.display = 'flex';
+    }
+  </script>
+</body>
+</html>
